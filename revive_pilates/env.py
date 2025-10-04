@@ -41,7 +41,7 @@ EMAIL_CONFIG = {
 SECURITY_CONFIG = {
     'SECRET_KEY': get_env_var('SECRET_KEY', 'django-insecure-revive-pilates-secret-key-2025'),
     'DEBUG': get_env_var('DEBUG', 'True').lower() == 'true',
-    'ALLOWED_HOSTS': get_env_var('ALLOWED_HOSTS', 'config-testing.revivepilates.com,booking-testing.revivepilates.com,localhost,127.0.0.1').split(','),
+    'ALLOWED_HOSTS': ['*'],
 }
 
 # CORS configuration
