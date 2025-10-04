@@ -1,7 +1,9 @@
 # studio/management/commands/populate_payments.py
 from pathlib import Path
+
 from django.core.management.base import BaseCommand
 from studio.utils import import_payments_from_excel
+
 
 class Command(BaseCommand):
     help = "Importa pagos desde un Excel y actualiza el estado del cliente."

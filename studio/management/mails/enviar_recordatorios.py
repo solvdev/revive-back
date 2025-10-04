@@ -1,18 +1,21 @@
-from django.core.management.base import BaseCommand
-from studio.models import Payment
-from studio.management.mails.mails import send_renewal_reminder_email
-from django.utils import timezone
 from datetime import timedelta
+
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+from studio.management.mails.mails import send_renewal_reminder_email
+from studio.models import Payment
 
 
 class Command(BaseCommand):
-    help = 'Envía correos de recordatorio a clientes cuyas membresías vencen pronto'
+    help = "Envía correos de recordatorio a clientes cuyas membresías vencen pronto"
 
     def handle(self, *args, **kwargs):
         hoy = timezone.now().date()
         target_date = hoy + timedelta(days=7)
 
-        pagos = Payment.objects.filter(valid_until=target_date).select_related('client', 'membership')
+        pagos = Payment.objects.filter(valid_until=target_date).select_related(
+            "client", "membership"
+        )
 
         enviados = 0
         for pago in pagos:
@@ -20,7 +23,7 @@ class Command(BaseCommand):
             tiene_renovacion = Payment.objects.filter(
                 client=pago.client,
                 date_paid__gt=pago.date_paid,
-                valid_until__gt=pago.valid_until
+                valid_until__gt=pago.valid_until,
             ).exists()
 
             if tiene_renovacion:

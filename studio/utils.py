@@ -1,40 +1,32 @@
-
-from decimal import Decimal
-from datetime import datetime, timedelta
-import pandas as pd
 import unicodedata
+from datetime import datetime, timedelta
+from decimal import Decimal
 
-from django.db import models, transaction
-from django.db.models import Count, Sum
-
-from django.db.models import Sum
-from .models import Payment, MonthlyRevenue
-from django.utils import timezone
-from datetime import timedelta
-
-from django.db.models.functions import TruncMonth
-from django.utils import timezone
-
-from .models import Membership, Payment, MonthlyRevenue, Booking
+import pandas as pd
 from accounts.models import Client
-from django.db.models import Q
+from django.db import transaction
+from django.db.models import Count, Q, Sum
+
+# from django.db.models.functions import TruncMonth
+from django.utils import timezone
+
+from .models import Booking, Membership, MonthlyRevenue, Payment, Venta
 
 # -----------------------------------------------------------------------------
 # Helper utilities
 
 
-
 def recalculate_monthly_revenue(year, month):
-    from .models import Payment, MonthlyRevenue, Venta
+    from .models import MonthlyRevenue, Payment, Venta
 
     # Pagos
     payments = Payment.objects.filter(date_paid__year=year, date_paid__month=month)
-    total_payments = payments.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_payments = payments.aggregate(Sum("amount"))["amount__sum"] or 0
     count_payments = payments.count()
 
     # Ventas
     ventas = Venta.objects.filter(date_sold__year=year, date_sold__month=month)
-    total_ventas = ventas.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    total_ventas = ventas.aggregate(Sum("total_amount"))["total_amount__sum"] or 0
     count_ventas = ventas.count()
 
     total = total_payments + total_ventas
@@ -43,11 +35,11 @@ def recalculate_monthly_revenue(year, month):
         year=year,
         month=month,
         defaults={
-            'total_amount': total,
-            'payment_count': count_payments,
-            'venta_total': total_ventas,
-            'venta_count': count_ventas
-        }
+            "total_amount": total,
+            "payment_count": count_payments,
+            "venta_total": total_ventas,
+            "venta_count": count_ventas,
+        },
     )
 
     return {
@@ -57,64 +49,67 @@ def recalculate_monthly_revenue(year, month):
         "from_payments": total_payments,
         "from_sales": total_ventas,
         "payments_count": count_payments,
-        "ventas_count": count_ventas
+        "ventas_count": count_ventas,
     }
 
-def recalculate_all_monthly_revenue():
-    from .models import Payment, Venta, MonthlyRevenue
 
-    from django.db.models.functions import ExtractYear, ExtractMonth
+def recalculate_all_monthly_revenue():
+    from django.db.models.functions import ExtractMonth, ExtractYear
 
     # Agrupar pagos
     payment_data = (
-        Payment.objects
-        .annotate(year=ExtractYear('date_paid'), month=ExtractMonth('date_paid'))
-        .values('year', 'month')
-        .annotate(total=Sum('amount'), count=Count('id'))
+        Payment.objects.annotate(
+            year=ExtractYear("date_paid"), month=ExtractMonth("date_paid")
+        )
+        .values("year", "month")
+        .annotate(total=Sum("amount"), count=Count("id"))
     )
 
     # Agrupar ventas
     venta_data = (
-        Venta.objects
-        .annotate(year=ExtractYear('date_sold'), month=ExtractMonth('date_sold'))
-        .values('year', 'month')
-        .annotate(total=Sum('total_amount'), count=Count('id'))
+        Venta.objects.annotate(
+            year=ExtractYear("date_sold"), month=ExtractMonth("date_sold")
+        )
+        .values("year", "month")
+        .annotate(total=Sum("total_amount"), count=Count("id"))
     )
 
     # Convertir a diccionarios accesibles
-    pagos_map = {(d['year'], d['month']): d for d in payment_data}
-    ventas_map = {(d['year'], d['month']): d for d in venta_data}
+    pagos_map = {(d["year"], d["month"]): d for d in payment_data}
+    ventas_map = {(d["year"], d["month"]): d for d in venta_data}
 
     # Combinar claves
     all_keys = set(pagos_map.keys()).union(set(ventas_map.keys()))
 
     results = []
 
-    for (year, month) in sorted(all_keys, reverse=True):
-        pagos = pagos_map.get((year, month), {'total': 0, 'count': 0})
-        ventas = ventas_map.get((year, month), {'total': 0, 'count': 0})
+    for year, month in sorted(all_keys, reverse=True):
+        pagos = pagos_map.get((year, month), {"total": 0, "count": 0})
+        ventas = ventas_map.get((year, month), {"total": 0, "count": 0})
 
-        total = (pagos['total'] or 0) + (ventas['total'] or 0)
+        total = (pagos["total"] or 0) + (ventas["total"] or 0)
 
         MonthlyRevenue.objects.update_or_create(
             year=year,
             month=month,
             defaults={
-                'total_amount': total,
-                'payment_count': pagos['count'],
-                'venta_total': ventas['total'] or 0,
-                'venta_count': ventas['count']
-            }
+                "total_amount": total,
+                "payment_count": pagos["count"],
+                "venta_total": ventas["total"] or 0,
+                "venta_count": ventas["count"],
+            },
         )
 
-        results.append({
-            "year": year,
-            "month": month,
-            "total_amount": total,
-            "payment_count": pagos['count'],
-            "venta_total": ventas['total'] or 0,
-            "venta_count": ventas['count']
-        })
+        results.append(
+            {
+                "year": year,
+                "month": month,
+                "total_amount": total,
+                "payment_count": pagos["count"],
+                "venta_total": ventas["total"] or 0,
+                "venta_count": ventas["count"],
+            }
+        )
 
     # Resetear meses antiguos sin datos
     existing = MonthlyRevenue.objects.all()
@@ -125,16 +120,19 @@ def recalculate_all_monthly_revenue():
             entry.venta_total = 0
             entry.venta_count = 0
             entry.save()
-            results.append({
-                "year": entry.year,
-                "month": entry.month,
-                "total_amount": 0,
-                "payment_count": 0,
-                "venta_total": 0,
-                "venta_count": 0
-            })
+            results.append(
+                {
+                    "year": entry.year,
+                    "month": entry.month,
+                    "total_amount": 0,
+                    "payment_count": 0,
+                    "venta_total": 0,
+                    "venta_count": 0,
+                }
+            )
 
     return results
+
 
 def count_valid_monthly_bookings(client, reference_date=None):
     """Return number of bookings for the client in the month excluding no-shows."""
@@ -153,17 +151,23 @@ def count_valid_monthly_bookings(client, reference_date=None):
         .count()
     )
 
+
 def count_valid_bookings_by_payment(client, payment: Payment):
     """Conteo válido ligado a un Payment (attended + pending futuras)."""
     today = timezone.now().date()
-    return Booking.objects.filter(
-        client=client,
-        status="active",
-        payment=payment,
-    ).filter(
-        Q(attendance_status="attended") |
-        Q(attendance_status="pending", class_date__gte=today)
-    ).count()
+    return (
+        Booking.objects.filter(
+            client=client,
+            status="active",
+            payment=payment,
+        )
+        .filter(
+            Q(attendance_status="attended")
+            | Q(attendance_status="pending", class_date__gte=today)
+        )
+        .count()
+    )
+
 
 def import_payments_from_excel(file_obj) -> dict:
     """
@@ -179,9 +183,15 @@ def import_payments_from_excel(file_obj) -> dict:
     def strip_accents(txt: str | None) -> str:
         if not txt:
             return ""
-        return "".join(
-            c for c in unicodedata.normalize("NFD", txt) if unicodedata.category(c) != "Mn"
-        ).lower().strip()
+        return (
+            "".join(
+                c
+                for c in unicodedata.normalize("NFD", txt)
+                if unicodedata.category(c) != "Mn"
+            )
+            .lower()
+            .strip()
+        )
 
     # ---------- leer Excel ----------
     try:
@@ -191,9 +201,7 @@ def import_payments_from_excel(file_obj) -> dict:
 
     required_cols = {"name", "membership", "amount", "payment_date"}
     if not required_cols.issubset(df.columns):
-        return {
-            "error": f"El archivo debe tener columnas: {', '.join(required_cols)}."
-        }
+        return {"error": f"El archivo debe tener columnas: {', '.join(required_cols)}."}
 
     # ---------- catálogos ----------
     memberships = {strip_accents(m.name): m for m in Membership.objects.all()}
@@ -227,14 +235,19 @@ def import_payments_from_excel(file_obj) -> dict:
 
                 if client is None:
                     failed.append(
-                        {"row": idx + 2, "error": f"Cliente no encontrado: {name_raw} / {email_raw}"}
+                        {
+                            "row": idx + 2,
+                            "error": f"Cliente no encontrado: {name_raw} / {email_raw}",
+                        }
                     )
                     continue
 
                 # ---------- membresía ----------
                 membership = memberships.get(strip_accents(mem_raw))
                 if membership is None:
-                    failed.append({"row": idx + 2, "error": f"Membresía no encontrada: {mem_raw}"})
+                    failed.append(
+                        {"row": idx + 2, "error": f"Membresía no encontrada: {mem_raw}"}
+                    )
                     continue
 
                 # ---------- monto ----------
@@ -265,7 +278,7 @@ def import_payments_from_excel(file_obj) -> dict:
                 dup = Payment.objects.filter(
                     client=client,
                     membership=membership,
-                    date_paid=pay_dt,   # incluye hora
+                    date_paid=pay_dt,  # incluye hora
                     amount=amount,
                 ).exists()
                 if dup:

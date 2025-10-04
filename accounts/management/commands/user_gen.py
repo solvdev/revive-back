@@ -1,7 +1,8 @@
-from django.db import transaction
 from accounts.models import Client, CustomUser
 from django.contrib.auth.models import Group
+from django.db import transaction
 from django.utils.text import slugify
+
 
 @transaction.atomic
 def generar_usuarios_para_clientes_activos():
@@ -17,8 +18,8 @@ def generar_usuarios_para_clientes_activos():
         ln = (cliente.last_name or "").strip()
 
         # Generar username: inicial de nombre + primera palabra del apellido
-        first_initial = (fn[0].lower() if fn else "x")
-        last_word = (ln.lower().split()[0] if ln else "cliente")
+        first_initial = fn[0].lower() if fn else "x"
+        last_word = ln.lower().split()[0] if ln else "cliente"
         username_base = slugify(f"{first_initial}{last_word}") or "cliente"
         username = username_base
 
@@ -48,6 +49,7 @@ def generar_usuarios_para_clientes_activos():
         print(f"✔ {cliente.full_name} -> {username}")
 
     print(f"\n✅ Proceso completado. Usuarios creados: {creados}/{clientes.count()}.")
+
 
 # Ejecutar
 generar_usuarios_para_clientes_activos()

@@ -53,19 +53,7 @@ CORS_ALLOW_ALL_ORIGINS = CORS_CONFIG['ALLOW_ALL_ORIGINS']
 
 CORS_ALLOWED_ORIGINS = CORS_CONFIG['ALLOWED_ORIGINS']
 
-# Permitir headers personalizados
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-    'x-sedes-selected',  # Nuestro header personalizado
-]
+# Permitir headers personalizados (configuración movida más abajo)
 
 
 # Application definition
@@ -266,6 +254,7 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
     'x-sedes-selected',  # Header personalizado para sede
+    'x-sede-id',  # Header para sede individual
 ]
 
 # Configuración adicional de CORS para producción
@@ -280,6 +269,34 @@ CORS_ALLOW_METHODS = [
 
 # Headers expuestos para el frontend
 CORS_EXPOSE_HEADERS = [
-    'x-sedes-selected',
-    'x-total-count',
+    "x-sedes-selected",
+    "x-sede-id",
+    "x-total-count",
 ]
+
+# Configuración de Logging - Simplificada
+# Solo logs básicos de Django, la bitácora de términos se maneja en BD
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}

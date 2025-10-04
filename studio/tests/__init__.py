@@ -1,1 +1,1 @@
-# Tests for studio app
+# Studio app tests

@@ -1,26 +1,38 @@
-from apscheduler.schedulers.background import BackgroundScheduler
-from django_apscheduler.jobstores import DjangoJobStore
-from django_apscheduler.models import DjangoJobExecution
-from studio.models import Payment
-from studio.management.mails.mails import send_renewal_reminder_email, send_subscription_expired_email
-from django.utils import timezone
 from datetime import timedelta
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from django.utils import timezone
+from django_apscheduler.jobstores import DjangoJobStore
+
+# from django_apscheduler.models import DjangoJobExecution
+from studio.management.mails.mails import (
+    send_renewal_reminder_email,
+    send_subscription_expired_email,
+)
+from studio.models import Payment
 
 
 def run_reminder_task():
     hoy = timezone.now().date()
     target_date = hoy + timedelta(days=2)
 
-    pagos = Payment.objects.filter(valid_until=target_date).select_related('client', 'membership')
+    pagos = Payment.objects.filter(valid_until=target_date).select_related(
+        "client", "membership"
+    )
 
     for pago in pagos:
         # Validar que no haya una renovación más reciente
-        if Payment.objects.filter(client=pago.client, date_paid__gt=pago.date_paid, valid_until__gt=pago.valid_until).exists():
+        if Payment.objects.filter(
+            client=pago.client,
+            date_paid__gt=pago.date_paid,
+            valid_until__gt=pago.valid_until,
+        ).exists():
             continue
         try:
             send_renewal_reminder_email(pago.client, pago)
         except Exception as e:
             print(f"Error al enviar recordatorio a {pago.client.email}: {e}")
+
 
 def run_expired_subscription_task():
     today = timezone.now().date()
@@ -33,7 +45,7 @@ def run_expired_subscription_task():
         has_renewed = Payment.objects.filter(
             client=payment.client,
             date_paid__gt=payment.date_paid,
-            valid_until__gt=payment.valid_until
+            valid_until__gt=payment.valid_until,
         ).exists()
 
         if not has_renewed:
