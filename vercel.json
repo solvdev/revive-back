@@ -9,11 +9,16 @@
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "api/index.py"
     }
   ],
   "env": {
     "DJANGO_SETTINGS_MODULE": "revive_pilates.settings"
-  }
+  },
+  "buildCommand": "bash build.sh"
 }
