@@ -4,7 +4,10 @@
     {
       "src": "api/index.py",
       "use": "@vercel/python",
-      "config": {"maxLambdaSize":"15mb", "runtime":"python3.12.2"}
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.12.2"
+      }
     }
   ],
   "routes": [
@@ -19,6 +22,5 @@
   ],
   "env": {
     "DJANGO_SETTINGS_MODULE": "revive_pilates.settings"
-  },
-  "buildCommand": "bash build.sh"
+  }
 }
