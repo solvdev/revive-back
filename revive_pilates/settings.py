@@ -34,7 +34,7 @@ except ImportError:
     SECURITY_CONFIG = {
         'SECRET_KEY': 'django-insecure-revive-pilates-secret-key-2025',
         'DEBUG': True,
-        'ALLOWED_HOSTS': ['*', 'config.revivepilates.com', 'admin.revivepilates.com', 'booking.revivepilates.com', 'revive-back.vercel.app'],
+        'ALLOWED_HOSTS': ['*', 'config.revivepilates.com', 'admin.revivepilates.com', 'booking.revivepilates.com', '*.vercel.app'],
     }
     CORS_CONFIG = {
         'ALLOW_ALL_ORIGINS': True,
