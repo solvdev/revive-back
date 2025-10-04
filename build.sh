@@ -1,11 +1,14 @@
 #!/bin/bash
-# Build script for Vercel deployment
+set -e
 
-# Install dependencies
+echo "Starting Vercel build process..."
+
+# Install Python dependencies
+echo "Installing Python dependencies..."
 pip install -r requirements.txt
 
-# Run collectstatic
-python manage.py collectstatic --noinput
+# Run Django collectstatic
+echo "Running Django collectstatic..."
+python manage.py collectstatic --noinput --clear
 
-# Run migrations (if needed)
-# python manage.py migrate --noinput
+echo "Build completed successfully!"

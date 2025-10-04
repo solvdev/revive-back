@@ -1,5 +1,11 @@
 {
+  "name": "revive-back",
+  "version": "1.0.0",
   "scripts": {
-    "build": "python manage.py collectstatic --noinput"
+    "build": "pip install -r requirements.txt && python manage.py collectstatic --noinput --clear",
+    "vercel-build": "pip install -r requirements.txt && python manage.py collectstatic --noinput --clear"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
