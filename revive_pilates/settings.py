@@ -247,6 +247,8 @@ else:
         "https://admin.revivepilates.com",
         "https://booking.revivepilates.com",
         "https://config.revivepilates.com",
+        "https://revive-admin.vercel.app",
+        "https://*.vercel.app",
         # Agregar otros dominios de producción según sea necesario
     ]
 
