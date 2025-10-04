@@ -816,7 +816,7 @@ def request_password_reset(request):
         from django.conf import settings
 
         try:
-            from vile_pilates.env import FRONTEND_URL
+            from revive_pilates.env import FRONTEND_URL
 
             frontend_url = FRONTEND_URL
         except ImportError:
@@ -824,7 +824,7 @@ def request_password_reset(request):
         reset_url = f"{frontend_url}/auth/reset-password/{token.token}"
 
         # Simple email template
-        subject = "Recuperación de Contraseña - Vilé Pilates"
+        subject = "Recuperación de Contraseña - Revive Pilates"
         html_message = f"""
         <h2>Recuperación de Contraseña</h2>
         <p>Hola {user.first_name},</p>
@@ -833,7 +833,7 @@ def request_password_reset(request):
         <p>Este enlace expirará en 24 horas.</p>
         <p>Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
         <br>
-        <p>Saludos,<br>Equipo Vilé Pilates</p>
+        <p>Saludos,<br>Equipo Revive Pilates</p>
         """
 
         plain_message = strip_tags(html_message)
@@ -843,7 +843,7 @@ def request_password_reset(request):
             send_mail(
                 subject,
                 plain_message,
-                "no-reply@vilepilates.com",
+                "no-reply@revivepilatesgt.com",
                 [email],
                 html_message=html_message,
                 fail_silently=False,

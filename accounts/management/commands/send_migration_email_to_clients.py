@@ -65,7 +65,7 @@ class Command(BaseCommand):
             self.stdout.write("🔍 MODO DRY-RUN - No se enviarán emails reales")
 
         # Obtener URL del frontend
-        frontend_url = "https://booking.vilepilates.com"
+        frontend_url = "https://booking.revivepilatesgt.com"
 
         migration_url = f"{frontend_url}/auth/migrate-existing-user"
 
@@ -109,17 +109,17 @@ class Command(BaseCommand):
 
     def send_migration_email(self, client, migration_url):
         """Enviar email de migración a un cliente"""
-        subject = "¡Actualiza tu cuenta en Vilé Pilates - Nuevo Sistema de Reservas!"
+        subject = "¡Actualiza tu cuenta en Revive Pilates - Nuevo Sistema de Reservas!"
 
         html_message = f"""
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-                <img src="{migration_url.replace('/auth/migrate-existing-user', '')}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
+                <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
                 <h1 style="color: #2c3e50; margin-top: 20px;">¡Hola {client.first_name}!</h1>
             </div>
 
             <div style="padding: 30px;">
-                <p>Esperamos que estés disfrutando de tus clases en Vilé Pilates. Tenemos una excelente noticia para ti:</p>
+                <p>Esperamos que estés disfrutando de tus clases en Revive Pilates. Tenemos una excelente noticia para ti:</p>
 
                 <div style="background-color: #e8f5e8; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h2 style="color: #27ae60; margin-top: 0;">🎉 ¡Nuevo Sistema de Reservas Online!</h2>
@@ -135,7 +135,7 @@ class Command(BaseCommand):
 
                 <div style="background-color: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #856404; margin-top: 0;">🔑 ¿Cómo activar tu cuenta?</h3>
-                    <p style="color: #856404; margin-bottom: 15px;">Como ya eres cliente de Vilé Pilates, crear tu cuenta es súper fácil:</p>
+                    <p style="color: #856404; margin-bottom: 15px;">Como ya eres cliente de Revive Pilates, crear tu cuenta es súper fácil:</p>
                     <ol style="color: #856404;">
                         <li><strong>Haz clic en el botón de abajo</strong> o ve a: <a href="{migration_url}" style="color: #856404;">{migration_url}</a></li>
                         <li><strong>Ingresa tu email</strong> (el mismo que usas con nosotros)</li>
@@ -180,11 +180,11 @@ class Command(BaseCommand):
                 <p>¡Esperamos verte pronto en clase!</p>
 
                 <p>Saludos,<br>
-                <strong>Equipo Vilé Pilates</strong></p>
+                <strong>Equipo Revive Pilates</strong></p>
             </div>
 
             <div style="text-align: center; padding: 20px; background-color: #f8f9fa; color: #6c757d; font-size: 12px;">
-                <p>Este email fue enviado a clientes existentes de Vilé Pilates.</p>
+                <p>Este email fue enviado a clientes existentes de Revive Pilates.</p>
                 <p>Si no deseas recibir estos emails, puedes contactarnos para darte de baja.</p>
             </div>
         </div>
@@ -195,7 +195,7 @@ class Command(BaseCommand):
         send_mail(
             subject,
             plain_message,
-            "no-reply@vilepilates.com",
+            "no-reply@revivepilatesgt.com",
             [client.email],
             html_message=html_message,
             fail_silently=False,

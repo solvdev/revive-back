@@ -8,17 +8,17 @@ from django.utils.html import strip_tags
 
 def send_user_generated_email(user, client, temp_password):
     """Enviar email cuando se genera un usuario para un cliente existente"""
-    frontend_url = "https://booking.vilepilates.com"
+    frontend_url = "https://booking.revivepilatesgt.com"
 
     login_url = f"{frontend_url}/auth/login"
 
-    subject = "¡Bienvenido a Vilé Pilates - Tu cuenta está lista!"
+    subject = "¡Bienvenido a Revive Pilates - Tu cuenta está lista!"
 
     html_message = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-            <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
-            <h1 style="color: #2c3e50; margin-top: 20px;">¡Bienvenido a Vilé Pilates!</h1>
+            <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
+            <h1 style="color: #2c3e50; margin-top: 20px;">¡Bienvenido a Revive Pilates!</h1>
         </div>
 
         <div style="padding: 30px;">
@@ -62,7 +62,7 @@ def send_user_generated_email(user, client, temp_password):
             <p>¡Esperamos verte pronto en clase!</p>
 
             <p>Saludos,<br>
-            <strong>Equipo Vilé Pilates</strong></p>
+            <strong>Equipo Revive Pilates</strong></p>
         </div>
 
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa; color: #6c757d; font-size: 12px;">
@@ -77,7 +77,7 @@ def send_user_generated_email(user, client, temp_password):
     send_mail(
         subject,
         plain_message,
-        "no-reply@vilepilates.com",
+        "no-reply@revivepilatesgt.com",
         [user.email],
         html_message=html_message,
         fail_silently=False,
@@ -86,23 +86,23 @@ def send_user_generated_email(user, client, temp_password):
 
 def send_welcome_email(user, client):
     """Enviar email de bienvenida para nuevos registros"""
-    frontend_url = "https://booking.vilepilates.com"
+    frontend_url = "https://booking.revivepilatesgt.com"
 
     login_url = f"{frontend_url}/auth/login"
 
-    subject = "¡Bienvenido a Vilé Pilates!"
+    subject = "¡Bienvenido a Revive Pilates!"
 
     html_message = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-            <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
-            <h1 style="color: #2c3e50; margin-top: 20px;">¡Bienvenido a Vilé Pilates!</h1>
+            <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
+            <h1 style="color: #2c3e50; margin-top: 20px;">¡Bienvenido a Revive Pilates!</h1>
         </div>
 
         <div style="padding: 30px;">
             <p>Hola {client.first_name},</p>
 
-            <p>¡Gracias por registrarte en Vilé Pilates! Estamos emocionados de tenerte como parte de nuestra comunidad.</p>
+            <p>¡Gracias por registrarte en Revive Pilates! Estamos emocionados de tenerte como parte de nuestra comunidad.</p>
 
             <div style="text-align: center; margin: 30px 0;">
                 <a href="{login_url}"
@@ -124,7 +124,7 @@ def send_welcome_email(user, client):
             <p>¡Esperamos verte pronto en clase!</p>
 
             <p>Saludos,<br>
-            <strong>Equipo Vilé Pilates</strong></p>
+            <strong>Equipo Revive Pilates</strong></p>
         </div>
     </div>
     """
@@ -134,7 +134,7 @@ def send_welcome_email(user, client):
     send_mail(
         subject,
         plain_message,
-        "no-reply@vilepilates.com",
+        "no-reply@revivepilatesgt.com",
         [user.email],
         html_message=html_message,
         fail_silently=False,
@@ -143,14 +143,14 @@ def send_welcome_email(user, client):
 
 def send_membership_cancellation_email(client):
     """Enviar email cuando se cancela una membresía"""
-    frontend_url = "https://booking.vilepilates.com"
+    frontend_url = "https://booking.revivepilatesgt.com"
 
-    subject = "Membresía cancelada - Vilé Pilates"
+    subject = "Membresía cancelada - Revive Pilates"
 
     html_message = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-            <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
+            <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
             <h1 style="color: #2c3e50; margin-top: 20px;">Membresía Cancelada</h1>
         </div>
 
@@ -162,7 +162,7 @@ def send_membership_cancellation_email(client):
             <p>Si deseas reactivar tu membresía o tienes alguna consulta, no dudes en contactarnos.</p>
 
             <p>Saludos,<br>
-            <strong>Equipo Vilé Pilates</strong></p>
+            <strong>Equipo Revive Pilates</strong></p>
         </div>
     </div>
     """
@@ -172,7 +172,7 @@ def send_membership_cancellation_email(client):
     send_mail(
         subject,
         plain_message,
-        "no-reply@vilepilates.com",
+        "no-reply@revivepilatesgt.com",
         [client.email],
         html_message=html_message,
         fail_silently=False,
@@ -181,14 +181,14 @@ def send_membership_cancellation_email(client):
 
 def send_booking_confirmation_email(booking, client):
     """Enviar email de confirmación de reserva"""
-    frontend_url = "https://booking.vilepilates.com"
+    frontend_url = "https://booking.revivepilatesgt.com"
 
     subject = f"Reserva confirmada - {booking.schedule.class_type.name}"
 
     html_message = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-            <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
+            <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
             <h1 style="color: #2c3e50; margin-top: 20px;">Reserva Confirmada</h1>
         </div>
 
@@ -208,7 +208,7 @@ def send_booking_confirmation_email(booking, client):
             <p>¡Esperamos verte en clase!</p>
 
             <p>Saludos,<br>
-            <strong>Equipo Vilé Pilates</strong></p>
+            <strong>Equipo Revive Pilates</strong></p>
         </div>
     </div>
     """
@@ -218,7 +218,7 @@ def send_booking_confirmation_email(booking, client):
     send_mail(
         subject,
         plain_message,
-        "no-reply@vilepilates.com",
+        "no-reply@revivepilatesgt.com",
         [client.email],
         html_message=html_message,
         fail_silently=False,
@@ -227,14 +227,14 @@ def send_booking_confirmation_email(booking, client):
 
 def send_subscription_confirmation_email(client, membership):
     """Enviar email de confirmación de suscripción"""
-    frontend_url = "https://booking.vilepilates.com"
+    frontend_url = "https://booking.revivepilatesgt.com"
 
-    subject = "Suscripción confirmada - Vilé Pilates"
+    subject = "Suscripción confirmada - Revive Pilates"
 
     html_message = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-            <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
+            <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
             <h1 style="color: #2c3e50; margin-top: 20px;">Suscripción Confirmada</h1>
         </div>
 
@@ -253,7 +253,7 @@ def send_subscription_confirmation_email(client, membership):
             <p>¡Disfruta de tu membresía!</p>
 
             <p>Saludos,<br>
-            <strong>Equipo Vilé Pilates</strong></p>
+            <strong>Equipo Revive Pilates</strong></p>
         </div>
     </div>
     """
@@ -263,7 +263,7 @@ def send_subscription_confirmation_email(client, membership):
     send_mail(
         subject,
         plain_message,
-        "no-reply@vilepilates.com",
+        "no-reply@revivepilatesgt.com",
         [client.email],
         html_message=html_message,
         fail_silently=False,
@@ -272,14 +272,14 @@ def send_subscription_confirmation_email(client, membership):
 
 def send_individual_booking_pending_email(booking, client):
     """Enviar email de reserva pendiente"""
-    frontend_url = "https://booking.vilepilates.com"
+    frontend_url = "https://booking.revivepilatesgt.com"
 
     subject = f"Reserva pendiente - {booking.schedule.class_type.name}"
 
     html_message = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-            <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
+            <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
             <h1 style="color: #2c3e50; margin-top: 20px;">Reserva Pendiente</h1>
         </div>
 
@@ -298,7 +298,7 @@ def send_individual_booking_pending_email(booking, client):
             <p>Te notificaremos cuando tu reserva sea confirmada.</p>
 
             <p>Saludos,<br>
-            <strong>Equipo Vilé Pilates</strong></p>
+            <strong>Equipo Revive Pilates</strong></p>
         </div>
     </div>
     """
@@ -308,7 +308,7 @@ def send_individual_booking_pending_email(booking, client):
     send_mail(
         subject,
         plain_message,
-        "no-reply@vilepilates.com",
+        "no-reply@revivepilatesgt.com",
         [client.email],
         html_message=html_message,
         fail_silently=False,
@@ -317,14 +317,14 @@ def send_individual_booking_pending_email(booking, client):
 
 def send_booking_cancellation_email(booking, client):
     """Enviar email de cancelación de reserva"""
-    frontend_url = "https://booking.vilepilates.com"
+    frontend_url = "https://booking.revivepilatesgt.com"
 
     subject = f"Reserva cancelada - {booking.schedule.class_type.name}"
 
     html_message = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-            <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
+            <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
             <h1 style="color: #2c3e50; margin-top: 20px;">Reserva Cancelada</h1>
         </div>
 
@@ -343,7 +343,7 @@ def send_booking_cancellation_email(booking, client):
             <p>Si necesitas hacer una nueva reserva, puedes hacerlo desde tu cuenta.</p>
 
             <p>Saludos,<br>
-            <strong>Equipo Vilé Pilates</strong></p>
+            <strong>Equipo Revive Pilates</strong></p>
         </div>
     </div>
     """
@@ -353,7 +353,7 @@ def send_booking_cancellation_email(booking, client):
     send_mail(
         subject,
         plain_message,
-        "no-reply@vilepilates.com",
+        "no-reply@revivepilatesgt.com",
         [client.email],
         html_message=html_message,
         fail_silently=False,
@@ -362,14 +362,14 @@ def send_booking_cancellation_email(booking, client):
 
 def send_booking_reschedule_email(booking, client):
     """Enviar email de reprogramación de reserva"""
-    frontend_url = "https://booking.vilepilates.com"
+    frontend_url = "https://booking.revivepilatesgt.com"
 
     subject = f"Reserva reprogramada - {booking.schedule.class_type.name}"
 
     html_message = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-            <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
+            <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
             <h1 style="color: #2c3e50; margin-top: 20px;">Reserva Reprogramada</h1>
         </div>
 
@@ -388,7 +388,7 @@ def send_booking_reschedule_email(booking, client):
             <p>¡Esperamos verte en tu nueva clase!</p>
 
             <p>Saludos,<br>
-            <strong>Equipo Vilé Pilates</strong></p>
+            <strong>Equipo Revive Pilates</strong></p>
         </div>
     </div>
     """
@@ -398,7 +398,7 @@ def send_booking_reschedule_email(booking, client):
     send_mail(
         subject,
         plain_message,
-        "no-reply@vilepilates.com",
+        "no-reply@revivepilatesgt.com",
         [client.email],
         html_message=html_message,
         fail_silently=False,
@@ -407,14 +407,14 @@ def send_booking_reschedule_email(booking, client):
 
 def send_bulk_booking_confirmation_email(client, bookings):
     """Enviar email de confirmación de reservas múltiples"""
-    frontend_url = "https://booking.vilepilates.com"
+    frontend_url = "https://booking.revivepilatesgt.com"
 
     subject = f"Reservas confirmadas - {len(bookings)} clases"
 
     html_message = f"""
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-            <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
+            <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
             <h1 style="color: #2c3e50; margin-top: 20px;">Reservas Confirmadas</h1>
         </div>
 
@@ -433,7 +433,7 @@ def send_bulk_booking_confirmation_email(client, bookings):
             <p>¡Esperamos verte en todas tus clases!</p>
 
             <p>Saludos,<br>
-            <strong>Equipo Vilé Pilates</strong></p>
+            <strong>Equipo Revive Pilates</strong></p>
         </div>
     </div>
     """
@@ -443,7 +443,7 @@ def send_bulk_booking_confirmation_email(client, bookings):
     send_mail(
         subject,
         plain_message,
-        "no-reply@vilepilates.com",
+        "no-reply@revivepilatesgt.com",
         [client.email],
         html_message=html_message,
         fail_silently=False,

@@ -32,8 +32,8 @@ EMAIL_CONFIG = {
     'HOST': get_env_var('EMAIL_HOST', 'in-v3.mailjet.com'),
     'PORT': int(get_env_var('EMAIL_PORT', '587')),
     'USE_TLS': get_env_var('EMAIL_USE_TLS', 'True').lower() == 'true',
-    'HOST_USER': get_env_var('EMAIL_HOST_USER', 'c15bdbc4c6cbd885363c6dbd7e0db70d'),
-    'HOST_PASSWORD': get_env_var('EMAIL_HOST_PASSWORD', '1484577f04215c3451f7ca851d7be3ba'),
+    'HOST_USER': get_env_var('EMAIL_HOST_USER', '57730badce9a29c83f734d79aa610d21'),
+    'HOST_PASSWORD': get_env_var('EMAIL_HOST_PASSWORD', '1b5580494f3e93b59d0a9bc0a85bedfd'),
     'FROM_EMAIL': get_env_var('DEFAULT_FROM_EMAIL', 'no-reply@revivepilates.com'),
 }
 

@@ -80,7 +80,7 @@ class Command(BaseCommand):
                 # Crear usuario
                 user = User.objects.create_user(
                     username=username,
-                    email=client.email or f"{username}@temp.vilepilates.com",
+                    email=client.email or f"{username}@temp.revivepilatesgt.com",
                     password=temp_password,
                     first_name=client.first_name,
                     last_name=client.last_name,
@@ -162,12 +162,12 @@ class Command(BaseCommand):
     def send_notification_emails(self, generated_users):
         """Envía emails de notificación a los usuarios generados"""
         try:
-            from vile_pilates.env import FRONTEND_URL
+            from revive_pilates.env import FRONTEND_URL
 
             frontend_url = FRONTEND_URL
         except ImportError:
             frontend_url = getattr(
-                settings, "FRONTEND_URL", "https://app.vilepilates.com"
+                settings, "FRONTEND_URL", "https://app.revivepilatesgt.com"
             )
 
         login_url = f"{frontend_url}/auth/login"
@@ -178,13 +178,13 @@ class Command(BaseCommand):
             temp_password = user_data["temp_password"]
 
             try:
-                subject = "¡Bienvenido a Vilé Pilates - Tu cuenta está lista!"
+                subject = "¡Bienvenido a Revive Pilates - Tu cuenta está lista!"
 
                 html_message = f"""
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <div style="text-align: center; padding: 20px; background-color: #f8f9fa;">
-                        <img src="{frontend_url}/vile-logo.png" alt="Vilé Pilates" style="max-width: 200px;">
-                        <h1 style="color: #2c3e50; margin-top: 20px;">¡Bienvenido a Vilé Pilates!</h1>
+                        <img src="https://revivepilates.s3.us-east-2.amazonaws.com/imgs/revivewhite.png" alt="Revive Pilates" style="max-width: 200px;">
+                        <h1 style="color: #2c3e50; margin-top: 20px;">¡Bienvenido a Revive Pilates!</h1>
                     </div>
 
                     <div style="padding: 30px;">
@@ -228,7 +228,7 @@ class Command(BaseCommand):
                         <p>¡Esperamos verte pronto en clase!</p>
 
                         <p>Saludos,<br>
-                        <strong>Equipo Vilé Pilates</strong></p>
+                        <strong>Equipo Revive Pilates</strong></p>
                     </div>
 
                     <div style="text-align: center; padding: 20px; background-color: #f8f9fa; color: #6c757d; font-size: 12px;">
@@ -243,7 +243,7 @@ class Command(BaseCommand):
                 send_mail(
                     subject,
                     plain_message,
-                    "no-reply@vilepilates.com",
+                    "no-reply@revivepilatesgt.com",
                     [user.email],
                     html_message=html_message,
                     fail_silently=False,

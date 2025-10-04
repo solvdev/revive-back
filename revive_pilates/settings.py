@@ -218,17 +218,17 @@ if not DEBUG:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email Configuration - Disabled temporarily
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Cambiado para deshabilitar envío real
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Habilitar envío real
 EMAIL_HOST = 'in-v3.mailjet.com'  # Mailjet SMTP server
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = ''  # 'c15bdbc4c6cbd885363c6dbd7e0db70d'
-EMAIL_HOST_PASSWORD = ''  # '1484577f04215c3451f7ca851d7be3ba'
+EMAIL_HOST_USER = '57730badce9a29c83f734d79aa610d21'
+EMAIL_HOST_PASSWORD = '1b5580494f3e93b59d0a9bc0a85bedfd'
 DEFAULT_FROM_EMAIL = 'no-reply@revivepilates.com'
 
-# Mailjet API Configuration - Disabled temporarily
-MAILJET_API_KEY = ''  # 'c15bdbc4c6cbd885363c6dbd7e0db70d'
-MAILJET_SECRET_KEY = ''  # '1484577f04215c3451f7ca851d7be3ba'
+# Mailjet API Configuration
+MAILJET_API_KEY = '57730badce9a29c83f734d79aa610d21'
+MAILJET_SECRET_KEY = '1b5580494f3e93b59d0a9bc0a85bedfd'
 
 # CORS Configuration
 if DEBUG:
