@@ -76,3 +76,4 @@ class UserSede(models.Model):
             status=True,
             sede_users__user=user
         ).distinct()
+

@@ -14,6 +14,8 @@ from rest_framework.decorators import action, api_view, permission_classes
 # from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+# from drf_spectacular.utils import extend_schema
+# from drf_spectacular.openapi import OpenApiTypes
 from studio.mixins import SedeFilterMixin
 
 # from django.db.models import Count, Q, Sum
@@ -88,7 +90,7 @@ class ClientViewSet(SedeFilterMixin, viewsets.ModelViewSet):
     def simple_list(self, request):
         """Get only id, first_name, last_name for dropdowns - much faster"""
         clients = (
-            Client.objects.filter(status="A")
+            Client.objects.all()  # Removed status="A" filter to show all clients
             .only("id", "first_name", "last_name")
             .order_by("first_name", "last_name")
         )
@@ -120,7 +122,7 @@ class ClientViewSet(SedeFilterMixin, viewsets.ModelViewSet):
             query_start = time.time()
 
             # Usar el serializer minimalista
-            clients = Client.objects.filter(status="A").order_by(
+            clients = Client.objects.all().order_by(  # Removed status="A" filter to show all clients
                 "first_name", "last_name"
             )
 
@@ -816,7 +818,7 @@ def request_password_reset(request):
         from django.conf import settings
 
         try:
-            from revive_pilates.env import FRONTEND_URL
+            from vile_pilates.env import FRONTEND_URL
 
             frontend_url = FRONTEND_URL
         except ImportError:
@@ -824,7 +826,7 @@ def request_password_reset(request):
         reset_url = f"{frontend_url}/auth/reset-password/{token.token}"
 
         # Simple email template
-        subject = "Recuperación de Contraseña - Revive Pilates"
+        subject = "Recuperación de Contraseña - Vilé Pilates"
         html_message = f"""
         <h2>Recuperación de Contraseña</h2>
         <p>Hola {user.first_name},</p>
@@ -833,7 +835,7 @@ def request_password_reset(request):
         <p>Este enlace expirará en 24 horas.</p>
         <p>Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
         <br>
-        <p>Saludos,<br>Equipo Revive Pilates</p>
+        <p>Saludos,<br>Equipo Vilé Pilates</p>
         """
 
         plain_message = strip_tags(html_message)
@@ -843,7 +845,7 @@ def request_password_reset(request):
             send_mail(
                 subject,
                 plain_message,
-                "no-reply@revivepilatesgt.com",
+                "no-reply@vilepilates.com",
                 [email],
                 html_message=html_message,
                 fail_silently=False,
@@ -1083,6 +1085,18 @@ def set_password_for_generated_user(request):
     )
 
 
+# @extend_schema(
+#     summary="Aceptar Términos y Condiciones",
+#     description="Registra la aceptación de términos y condiciones por parte del cliente autenticado. Solo requiere terms_accepted=true, los demás campos son opcionales.",
+#     request=TermsAcceptanceSerializer,
+#     responses={
+#         200: OpenApiTypes.OBJECT,
+#         400: OpenApiTypes.OBJECT,
+#         401: OpenApiTypes.OBJECT,
+#         404: OpenApiTypes.OBJECT,
+#         500: OpenApiTypes.OBJECT
+#     }
+# )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def accept_terms(request):
@@ -1122,10 +1136,16 @@ def accept_terms(request):
         # Si no se proporciona IP, intentar obtenerla del request
         if not ip_address:
             ip_address = get_client_ip(request)
+            # Si aún no se puede obtener, usar un valor por defecto
+            if not ip_address:
+                ip_address = '0.0.0.0'  # IP por defecto para casos donde no se puede detectar
         
         # Si no se proporciona user agent, obtenerlo del request
         if not user_agent:
             user_agent = request.META.get('HTTP_USER_AGENT', '')
+            # Si aún no se puede obtener, usar un valor por defecto
+            if not user_agent:
+                user_agent = 'Unknown'
         
         # Actualizar el cliente con la aceptación de términos
         client.terms_accepted = True
@@ -1138,19 +1158,19 @@ def accept_terms(request):
             user=request.user,
             ip_address=ip_address,
             user_agent=user_agent,
-            session_id=request.session.session_key,
-            referrer_url=request.META.get('HTTP_REFERER'),
+            session_id=request.session.session_key or '',
+            referrer_url=request.META.get('HTTP_REFERER') or '',
             # Snapshot de información del cliente
-            client_first_name=client.first_name,
-            client_last_name=client.last_name,
-            client_dpi=client.dpi,
-            client_email=client.email,
-            client_phone=client.phone,
-            client_status=client.status,
+            client_first_name=client.first_name or '',
+            client_last_name=client.last_name or '',
+            client_dpi=client.dpi or '',
+            client_email=client.email or '',
+            client_phone=client.phone or '',
+            client_status=client.status or 'I',
             client_created_at=client.created_at,
             # Snapshot de información del usuario
-            user_username=request.user.username,
-            user_email=request.user.email,
+            user_username=request.user.username or '',
+            user_email=request.user.email or '',
             user_is_active=request.user.is_active,
             user_date_joined=request.user.date_joined
         )
@@ -1298,10 +1318,17 @@ class TermsAcceptanceLogViewSet(SedeFilterMixin, viewsets.ReadOnlyModelViewSet):
 def get_client_ip(request):
     """
     Función auxiliar para obtener la IP real del cliente
+    Retorna None si no se puede determinar la IP
     """
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
+    try:
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            # Tomar la primera IP de la lista (cliente real)
+            ip = x_forwarded_for.split(',')[0].strip()
+            return ip if ip else None
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+            return ip if ip else None
+    except Exception:
+        # Si hay cualquier error, retornar None
+        return None

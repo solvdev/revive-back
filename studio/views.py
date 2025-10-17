@@ -853,8 +853,20 @@ class BookingViewSet(SedeFilterMixin, viewsets.ModelViewSet):
 
         # 2) Si seleccionó clase individual
         if selected_membership == 1:
+            # Buscar la membresía de clase individual más apropiada
+            # Por defecto usar "Clase Individual" (ID 2) si no hay contexto específico
+            individual_membership = Membership.objects.filter(
+                name__icontains="individual"
+            ).first()
+            
+            if not individual_membership:
+                return Response(
+                    {"detail": "No se encontró membresía de clase individual configurada."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            
             booking = serializer.save(
-                membership=Membership.objects.get(pk=1), status="pending"
+                membership=individual_membership, status="pending"
             )
             send_individual_booking_pending_email(booking)
             return Response(
@@ -1432,7 +1444,7 @@ class BookingViewSet(SedeFilterMixin, viewsets.ModelViewSet):
                         membership=membership,
                         amount=amount,
                         date_paid=date_paid,
-                        valid_until=date_paid.date() + timedelta(days=30),
+                        # valid_until se calcula automáticamente en el modelo Payment.save()
                     )
 
                     # Verificar y actualizar estado activo
@@ -2224,7 +2236,7 @@ class PaymentViewSet(SedeFilterMixin, viewsets.ModelViewSet):
         today = date_paid.date()
         selected_promotion = None
         promo_instance = None
-        valid_until = today + timedelta(days=30)
+        # valid_until se calcula automáticamente en el modelo Payment.save()
 
         # Buscar si tiene una promoción activa asociada al mismo membership
         promo_instance = (
@@ -2247,7 +2259,7 @@ class PaymentViewSet(SedeFilterMixin, viewsets.ModelViewSet):
             membership=membership,
             amount=amount,
             date_paid=date_paid,
-            valid_until=valid_until,
+            # valid_until se calcula automáticamente en el modelo Payment.save()
             promotion=selected_promotion,
             promotion_instance=promo_instance,
             payment_method=payment_method,
@@ -2256,7 +2268,9 @@ class PaymentViewSet(SedeFilterMixin, viewsets.ModelViewSet):
         # Activar cliente y asignar membresía actual si su pago aún es vigente
         if payment.valid_until >= today:
             client.status = "A"
-            client.current_membership = membership
+            # Solo asignar current_membership si NO es una clase individual
+            if not membership.name.lower().__contains__("individual"):
+                client.current_membership = membership
             client.save(update_fields=["status", "current_membership"])
 
         # Confirmar plan intent si existe
@@ -2859,7 +2873,7 @@ class PromotionInstanceViewSet(SedeFilterMixin, viewsets.ModelViewSet):
         promotion = instance.promotion
         membership = promotion.membership
         amount = promotion.price
-        valid_until = today + timedelta(days=30)
+        # valid_until se calcula automáticamente en el modelo Payment.save()
 
         # Crear el pago vinculado a esta instancia
         payment = Payment.objects.create(
@@ -2869,13 +2883,16 @@ class PromotionInstanceViewSet(SedeFilterMixin, viewsets.ModelViewSet):
             promotion_instance=instance,
             amount=amount,
             date_paid=timezone.now(),
-            valid_until=valid_until,
+            # valid_until se calcula automáticamente en el modelo Payment.save()
         )
 
         # Activar cliente si aplica
-        if valid_until >= today and client.status != "A":
+        if payment.valid_until >= today and client.status != "A":
             client.status = "A"
-            client.save(update_fields=["status"])
+            # Solo asignar current_membership si NO es una clase individual
+            if not membership.name.lower().__contains__("individual"):
+                client.current_membership = membership
+            client.save(update_fields=["status", "current_membership"])
 
         # Confirmar plan intent si aplica (reutiliza tu lógica actual)
         try:
@@ -3087,7 +3104,7 @@ def create_authenticated_booking(request):
         # Get sede from schedule or request headers
         sede_id = schedule.sede_id if schedule.sede_id else request.headers.get('X-Sede-ID')
         
-        if membership and membership.id == 1:  # Clase individual
+        if membership and "individual" in membership.name.lower():  # Clase individual
             booking = Booking.objects.create(
                 client=client,
                 schedule=schedule,
@@ -3355,9 +3372,15 @@ class BulkBookingViewSet(SedeFilterMixin, viewsets.ModelViewSet):
                     selected_membership = request.data.get("membership_id")
 
                     if selected_membership == 1:  # Individual class
-                        booking.membership = Membership.objects.get(pk=1)
-                        booking.status = "pending"
-                        booking.save()
+                        # Buscar la membresía de clase individual más apropiada
+                        individual_membership = Membership.objects.filter(
+                            name__icontains="individual"
+                        ).first()
+                        
+                        if individual_membership:
+                            booking.membership = individual_membership
+                            booking.status = "pending"
+                            booking.save()
                         # No enviar correo individual, se enviará al final
                     elif not client.trial_used:
                         # Trial class

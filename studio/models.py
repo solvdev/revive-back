@@ -1,5 +1,5 @@
 # studio/models.py
-from datetime import timedelta
+from datetime import timedelta, date
 
 from accounts.models import Client, CustomUser
 from django.contrib.auth import get_user_model
@@ -347,6 +347,28 @@ class Payment(models.Model):
         help_text="Mes y año del recibo (formato: YYYY-MM)"
     )
     
+    # Campos para pagos anticipados
+    is_advance_payment = models.BooleanField(
+        default=False,
+        help_text="Indica si es un pago anticipado para un mes futuro"
+    )
+    target_month = models.CharField(
+        max_length=7,
+        blank=True,
+        null=True,
+        help_text="Mes objetivo para pago anticipado (formato: YYYY-MM)"
+    )
+    effective_from = models.DateField(
+        blank=True,
+        null=True,
+        help_text="Fecha efectiva de inicio de la membresía"
+    )
+    effective_until = models.DateField(
+        blank=True,
+        null=True,
+        help_text="Fecha efectiva de fin de la membresía"
+    )
+    
     extra_classes = models.PositiveIntegerField(
         default=0,
         help_text="Clases adicionales otorgadas (compensaciones u otros motivos).",
@@ -379,7 +401,7 @@ class Payment(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        # Solo manejar promociones - el frontend ahora calcula valid_until
+        # Solo manejar promociones
         if self.promotion:
             self.amount = self.promotion.price
         
@@ -387,9 +409,33 @@ class Payment(models.Model):
         if not self.receipt_number:
             self.receipt_number = self.generate_receipt_number()
         
-        # Generar month_year si no existe
-        if not self.month_year and self.valid_from:
-            self.month_year = self.valid_from.strftime('%Y-%m')
+        # Calcular fechas efectivas basado en tipo de pago
+        if self.is_advance_payment and self.target_month:
+            # Pago anticipado: usar target_month
+            year, month = map(int, self.target_month.split('-'))
+            self.effective_from = date(year, month, 1)
+            self.effective_until = date(year, month, 1) + timedelta(days=30)
+            self.month_year = self.target_month
+        else:
+            # Pago inmediato: usar fecha de pago
+            if not self.effective_from and self.date_paid:
+                self.effective_from = self.date_paid.date()
+            if not self.effective_until and self.effective_from:
+                # Para paquetes (no clases individuales): 30 días de vigencia
+                # Para clases individuales: mantener lógica específica si es necesario
+                if self.membership and not self.membership.name.lower().__contains__("individual"):
+                    self.effective_until = self.effective_from + timedelta(days=30)
+                else:
+                    # Clases individuales: también 30 días por defecto
+                    self.effective_until = self.effective_from + timedelta(days=30)
+            if not self.month_year and self.effective_from:
+                self.month_year = self.effective_from.strftime('%Y-%m')
+        
+        # Mantener compatibilidad con campos legacy
+        if not self.valid_from:
+            self.valid_from = self.effective_from
+        if not self.valid_until:
+            self.valid_until = self.effective_until
         
         super().save(*args, **kwargs)
     

@@ -256,6 +256,11 @@ class PaymentSerializer(serializers.ModelSerializer):
             "extra_classes",
             "sede",
             "sede_id",
+            # Campos para pagos anticipados
+            "is_advance_payment",
+            "target_month",
+            "effective_from",
+            "effective_until",
             "created_at",
             "updated_at",
             "created_by",
@@ -263,6 +268,12 @@ class PaymentSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
+            "valid_from",  # Calculado automáticamente por el backend
+            "valid_until",  # Calculado automáticamente por el backend
+            "month_year",   # Calculado automáticamente por el backend
+            "receipt_number",  # Generado automáticamente
+            "effective_from",  # Calculado automáticamente por el backend
+            "effective_until",  # Calculado automáticamente por el backend
             "created_at",
             "updated_at",
             "created_by",

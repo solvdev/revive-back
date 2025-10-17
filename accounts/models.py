@@ -233,15 +233,16 @@ class Client(models.Model):
             client=self,
             valid_from__lte=today,  # La vigencia ya empezó
             valid_until__gte=today  # Y aún no ha expirado
-        ).order_by('valid_until')
+        ).exclude(
+            membership__name__icontains="individual"  # Excluir clases individuales
+        ).order_by('-amount', '-valid_until')  # Priorizar por monto (paquetes completos) y luego por vigencia
         
         if not valid_payments.exists():
             return None
         
-        # Si hay pagos válidos, tomar el más reciente para obtener la membresía
-        # pero la vigencia real se calcula considerando todos los pagos
-        latest_valid_payment = valid_payments.last()
-        return latest_valid_payment.membership
+        # Tomar el pago con mayor monto (paquete completo) o el más reciente si hay empate
+        primary_payment = valid_payments.first()
+        return primary_payment.membership
     
     @property
     def membership_valid_until(self):

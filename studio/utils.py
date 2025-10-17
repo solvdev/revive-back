@@ -272,7 +272,10 @@ def import_payments_from_excel(file_obj) -> dict:
                 # a partir de la fecha de pago. Antes se asignaba la fecha del
                 # mismo día cuando ``classes_per_month`` era 0 o ``None`` y eso
                 # provocaba que las suscripciones caducaran inmediatamente.
-                valid_until = pay_dt.date() + timedelta(days=30)
+                payment_date = pay_dt.date()
+                valid_from = payment_date  # Vigencia desde el día del pago
+                valid_until = payment_date + timedelta(days=30)  # 30 días desde el pago
+                month_year = payment_date.strftime('%Y-%m')  # Mes y año del pago
 
                 # ---------- evitar duplicados ----------
                 dup = Payment.objects.filter(
@@ -291,7 +294,9 @@ def import_payments_from_excel(file_obj) -> dict:
                     membership=membership,
                     amount=amount,
                     date_paid=pay_dt,
-                    valid_until=valid_until,
+                    valid_from=valid_from,  # Fecha de inicio de vigencia
+                    valid_until=valid_until,  # Fecha de fin de vigencia
+                    month_year=month_year,   # Mes y año del pago para referencia
                 )
 
                 # ---------- actualizar estado del cliente ----------
